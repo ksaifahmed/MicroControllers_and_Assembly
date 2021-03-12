@@ -4,8 +4,8 @@
     L EQU 021h  ;lower range
     H EQU 07Eh ;upper range
     
-    vld_msg db "Valid Password$"
-    invld_msg db "Invalid password$"
+    vld_msg db 10,13,"Valid Password$"
+    invld_msg db 10,13,"Invalid password$"
     
     cap db 0
     low db 0
@@ -42,12 +42,15 @@ main proc
             ja ELSE2
             INC low
             jmp LOOP
-            
+        
+        ;num range    
         ELSE2:
             cmp al,030h
             jb EXIT_ELSE
             cmp al,039h
             ja EXIT_ELSE
+            INC num
+            jmp LOOP
             
         EXIT_ELSE:
             jmp LOOP
@@ -66,7 +69,8 @@ main proc
          
          mov ah,9
          lea dx,vld_msg
-         int 21h   
+         int 21h 
+         jmp exit  
          
          INVALID:
             mov ah,9

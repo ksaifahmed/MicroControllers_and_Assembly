@@ -194,6 +194,7 @@ main proc
     NOT_MUL:
         ;division
         mov ax,num1
+        cwd
         mov bx,num2
         idiv bx
         mov num1,ax

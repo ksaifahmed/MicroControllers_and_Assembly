@@ -3,7 +3,9 @@
 .data 
     a dw 100 dup(0) 
     seprtr db ", $"
-    inp dw ?
+    newl db 10,13,"0$"
+    ans dw ? 
+    count db 0
     
 
 .code
@@ -31,14 +33,32 @@ main proc
     add bl,al
     
     
-    mov inp,bx
     ;inp in bx 
     push bx
-    call fibo
+    call fibo 
     
-    mov si,inp
-    add si,si
-    mov bx,a[si]
+    ;print f0             
+    mov ah,9
+    lea dx,newl
+    int 21h  
+        
+    mov si,a offset
+    add si,2
+            
+    LOOP_PRINT:
+        mov bx,a[si]
+        mov ans,bx
+        cmp bx,0
+        jz exit
+        
+        ;print comma
+        mov ah,9
+        lea dx,seprtr
+        int 21h
+        
+        call print
+        add si,2
+        jmp LOOP_PRINT    
     
     
     EXIT:
@@ -74,4 +94,51 @@ fibo proc near
     RECURSIVE_RET:
         pop bp
         ret 2
+
+print proc near
+    mov al,0
+    mov count,al
+    
+    GET_DIGITS:
+        xor ax,ax
+        xor bx,bx
+        xor dx,dx
+        
+        ;divide ans with 10 
+        mov ax,ans
+        mov bx,10
+        div bx
+        mov ans,ax
+        
+        ;push remainder into stack
+        push dx
+        mov bl,count
+        inc bl
+        mov count,bl
+        
+        ;stop once quotient = 0
+        mov ax,ans
+        cmp ax,0
+        je PRINT_NUM
+        jmp GET_DIGITS
+        
+    PRINT_NUM:
+        mov cl,count
+    
+    ;for-loop
+    LOOP3:   
+        ;pop stack and print
+        pop dx
+        add dl,48
+        mov ah,2
+        int 21h
+        
+        ;exit when cl = 0
+        dec cl
+        cmp cl,0
+        je RETURN
+        jmp LOOP3 
+    RETURN:
+        RET
+
 end main

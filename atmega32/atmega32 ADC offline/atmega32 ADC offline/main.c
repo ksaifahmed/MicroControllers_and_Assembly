@@ -10,19 +10,22 @@
 
 #include <avr/io.h>
 #include <util/delay.h>
+#include <stdlib.h>
+#include <string.h>
 #include "lcd.h"
 
 
 int main(void)
 {
-    ///uint8_t inp_L, inp_H;
-	//unsigned char res;
+    uint8_t inp_L, inp_H;
+	char val[5];
+	char msg[15];
 	
 	DDRD = 0xFF;
 	DDRC = 0xFF;
 	
-	ADMUX = 0b01000100;
-	ADCSRA = 0b10000101;
+	ADMUX = 0b01000100; //01 -> Avcc = Vref, 0 -> ADLAR right, 00100 -> ADC4
+	ADCSRA = 0b10000101; //1 -> ADEN, 101 -> 32 division factor
 	
 	Lcd4_Init();
 	Lcd4_Set_Cursor(1,1);
@@ -31,23 +34,23 @@ int main(void)
 	
 	
     while (1) 
-    {		
-		//Lcd4_Set_Cursor(1,1);
-		Lcd4_Clear();
-		Lcd4_Write_String("hehe");
-		_delay_ms(200);
-		
+    {	
 		ADCSRA |= (1 << ADSC);
 		while(ADCSRA & (1 << ADSC)) {;}
 			
-		//res = ADCL;
-		//res = ADCH;
+		inp_L = ADCL;
+		inp_H = ADCH;
+		
+		float f = (( (inp_H << 8) + inp_L ) * 5 )/1024.0;
+		dtostrf(f, 4, 2, val);
+		
+		strcpy(msg, "Voltage: ");
+		strcat(msg, val);
+		
 		
 		Lcd4_Clear();
-		//Lcd4_Set_Cursor(1,1);
-		Lcd4_Write_String("vodox");
-		
-		_delay_ms(200);
+		Lcd4_Write_String(msg);
+		_delay_ms(400);
     }
 	return 0;
 }

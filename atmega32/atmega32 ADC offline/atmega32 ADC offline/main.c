@@ -30,7 +30,8 @@ int main(void)
 	Lcd4_Init();
 	Lcd4_Set_Cursor(1,1);
 	Lcd4_Write_String("Loading...");
-	_delay_ms(500);
+	_delay_ms(300);
+	Lcd4_Clear();
 	
 	
     while (1) 
@@ -47,10 +48,9 @@ int main(void)
 		strcpy(msg, "Voltage: ");
 		strcat(msg, val);
 		
-		
-		Lcd4_Clear();
+		Lcd4_Set_Cursor(1,1);
 		Lcd4_Write_String(msg);
-		_delay_ms(400);
+		_delay_ms(200);
     }
 	return 0;
 }
